@@ -1,0 +1,107 @@
+# What Happens When You Type https://www.google.com and Press Enter?
+
+It looks like a simple action: you type a URL, hit Enter, and a fraction of a second later, the Google homepage appears. However, behind the scenes, a complex chain of events takes place across the internet.
+
+This is one of the most famous technical interview questions for software engineers.
+
+> 💡 **Interview Tip:** If you ever get asked this question in an interview, always ask the interviewer where they want you to focus. A front-end engineer might focus on browser rendering (the DOM), while a DevOps or Site Reliability Engineer (SRE) will want to dive deep into infrastructure, load balancers, and network protocols.
+
+Let's break down this journey step-by-step from the infrastructure perspective.
+
+---
+
+## Step 1: The Browser and the DNS Request
+
+When you type `https://www.google.com`, your browser faces an immediate problem: it doesn't know where Google lives. Computers communicate using numeric **IP Addresses**, not human words. To solve this, the browser uses **DNS (Domain Name System)**.
+
+Think of DNS as the phonebook of the internet.
+
+1. **Browser Cache:** The browser first checks its own history to see if it remembers Google's IP.
+2. **OS Cache & Resolver:** If not found, it asks your computer's Operating System, which then queries the Internet Service Provider (ISP).
+3. **DNS Lookup:** The request travels up to DNS servers until it finds the **A record** for `www.google.com`, which returns an IPv4 address (for example, `172.217.16.142`).
+
+---
+
+## Step 2: Setting up the TCP/IP Connection
+
+Now that your browser has the correct IP address, it needs to build a safe highway to transport the data. This is done using the **TCP/IP (Transmission Control Protocol / Internet Protocol)** suite.
+
+To ensure both sides are ready, a **TCP 3-Way Handshake** occurs:
+
+- **SYN (Synchronize):** Your computer sends a packet to the server saying, _"I want to connect."_
+- **SYN-ACK (Synchronize-Acknowledge):** The server replies, _"I received your request, I am ready too."_
+- **ACK (Acknowledge):** Your computer sends a final packet back saying, _"Great, let's start talking."_
+
+---
+
+## Step 3: Passing Through the Firewall
+
+Before your request can even touch the destination server, it must pass through security checkpoints called **Firewalls**.
+
+Firewalls protect both your computer and the server infrastructure. The server-side firewall inspects the incoming data packets to make sure they are safe, coming from legal ports, and do not represent a cyber-attack (like a DDoS attack). If the traffic looks safe, the firewall allows it to pass.
+
+---
+
+## Step 4: The Secure HTTPS/SSL Handshake
+
+Because the URL starts with `https://` (and not just `http`), the connection must be fully encrypted using **SSL/TLS (Secure Sockets Layer / Transport Layer Security)**. This prevents hackers from spying on your data.
+
+During the SSL handshake:
+
+- The server shares its **SSL Certificate** and public key with your browser.
+- The browser verifies that the certificate is real and trusted.
+- Both sides agree on a unique "session key" to encrypt all requests and responses moving forward.
+
+---
+
+## Step 5: Meeting the Load-Balancer
+
+Large websites like Google handle billions of requests every day. A single server would instantly crash under this traffic. Therefore, your request first arrives at a **Load-balancer** (such as HAProxy or Nginx).
+
+The load balancer acts like a traffic cop. It uses routing algorithms (like Round Robin) to forward your request to one specific, healthy web server out of a massive cluster, ensuring no single machine gets overloaded.
+
+---
+
+## Step 6: The Web Server Takes the Request
+
+The request finally hits a **Web Server** (like Nginx or Apache). The primary job of the web server is to handle basic HTTP requests.
+
+- If you are just asking for static files (like Google's logo image or basic styles), the web server serves them directly.
+- If you are searching for something dynamic (like typing a query in the search bar), the web server passes the request deeper into the system to the application layer.
+
+---
+
+## Step 7: Processing via the Application Server
+
+The **Application Server** runs the actual backend code of the website (written in languages like Python, Go, Java, or PHP).
+
+This server processes the core business logic. For example, it takes the search keywords you typed, runs algorithms to understand what you are looking for, and prepares to fetch the relevant results.
+
+---
+
+## Step 8: Fetching Data from the Database
+
+To get the actual search results, user profiles, or account settings, the application server talks to the final layer: the **Database** (like MySQL, PostgreSQL, or Bigtable).
+
+The application server sends a secure query to the database, the database retrieves the requested records, and sends them back up.
+
+---
+
+## The Return Journey (The Response)
+
+Once the application server gets the data, it packages it into a clean HTML, CSS, and JavaScript response. This package travels back up through the web server, through the load balancer, across the internet, and straight to your browser.
+
+Your browser reads the code, renders the visual page, and finally, the Google search page appears beautifully on your screen!
+
+---
+
+### Summary of the Stack:
+
+- **DNS:** Finds the numeric IP address.
+- **TCP/IP:** Builds the network connection highway.
+- **Firewall:** Blocks malicious web traffic.
+- **HTTPS/SSL:** Encrypts data for security.
+- **Load-Balancer:** Shares the traffic among servers.
+- **Web Server:** Serves static files and routes traffic.
+- **Application Server:** Runs the backend program logic.
+- **Database:** Securely stores and retrieves data.
